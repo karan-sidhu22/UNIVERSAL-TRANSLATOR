@@ -1,16 +1,27 @@
 import React from "react";
-import LANGUAGES from "../utils/languages";
+import { languages } from "../../utils/languages";
 
-export default function LanguageSelector({ value, onChange, label }) {
+export default function LanguageSelector({ sourceLang, targetLang, setSourceLang, setTargetLang }) {
   return (
-    <div style={{ flex: 1 }}>
-      <label>{label}</label>
+    <div className="flex justify-between gap-4">
       <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: 8 }}
+        value={sourceLang}
+        onChange={(e) => setSourceLang(e.target.value)}
+        className="p-2 border rounded-md"
       >
-        {LANGUAGES.map((lang) => (
+        {languages.map((lang) => (
+          <option key={lang.code} value={lang.code}>
+            {lang.name}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={targetLang}
+        onChange={(e) => setTargetLang(e.target.value)}
+        className="p-2 border rounded-md"
+      >
+        {languages.map((lang) => (
           <option key={lang.code} value={lang.code}>
             {lang.name}
           </option>

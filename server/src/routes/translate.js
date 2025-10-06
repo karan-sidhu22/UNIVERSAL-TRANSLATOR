@@ -1,17 +1,21 @@
-import { Router } from "express";
+import express from "express";
 import { translateText } from "../services/translateService.js";
 
-const router = Router();
+const router = express.Router();
 
 router.post("/", async (req, res) => {
+  const { text, sourceLang, targetLang } = req.body;
+
+  if (!text || !targetLang) {
+    return res.status(400).json({ error: "Missing text or target language." });
+  }
+
   try {
-    const { text, source, target } = req.body;
-    if (!text) return res.status(400).json({ error: "Missing text" });
-    const translatedText = await translateText(text, source, target);
+    const translatedText = await translateText(text, sourceLang, targetLang);
     res.json({ translatedText });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Translation failed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Translation failed." });
   }
 });
 
