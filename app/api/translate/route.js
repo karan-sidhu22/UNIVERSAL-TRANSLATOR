@@ -1,25 +1,34 @@
-import axios from "axios";
+// app/api/translate/route.js
+import OpenAI from "openai";
+import { NextResponse } from "next/server";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { text, targetLang } = body;
+    const { text, sourceLang, targetLang } = await req.json();
 
-    // Force source language to English for now
-    const res = await axios.get("https://api.mymemory.translated.net/get", {
-      params: {
-        q: text,
-        langpair: `en|${targetLang}`,
-      },
+    const prompt = `
+    Translate the following text from ${sourceLang} to ${targetLang}.
+    Text: "${text}"
+    Only return the translated text, nothing else.
+    `;
+
+    const response = await client.responses.create({
+      model: "gpt-4o-mini",
+      input: prompt,
     });
 
-    const translatedText = res.data.responseData.translatedText;
+    const translatedText = response.output[0].content[0].text;
 
-    return new Response(JSON.stringify({ translatedText }), { status: 200 });
-  } catch (err) {
-    console.error("Translation API error:", err.message);
-    return new Response(JSON.stringify({ error: "Translation failed" }), {
-      status: 500,
-    });
+    return NextResponse.json({ translatedText });
+  } catch (error) {
+    console.error("Translation Error:", error);
+    return NextResponse.json(
+      { error: "Translation failed" },
+      { status: 500 }
+    );
   }
 }

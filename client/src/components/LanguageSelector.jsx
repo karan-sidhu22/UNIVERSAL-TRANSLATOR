@@ -1,5 +1,5 @@
 import React from "react";
-import { languages } from "../../utils/languages";
+import { languages } from "../../../utils/languages";
 
 export default function LanguageSelector({ sourceLang, targetLang, setSourceLang, setTargetLang }) {
   return (
