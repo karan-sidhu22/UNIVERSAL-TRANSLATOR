@@ -1,71 +1,123 @@
 "use client";
-import React, { useState } from "react";
-import axios from "axios";
-import LanguageSelector from "../client/src/components/LanguageSelector";
-import { languages } from "../utils/languages";
 
-export default function Page() {
-  const [text, setText] = useState("");
-  const [translated, setTranslated] = useState("");
-  const [sourceLang, setSourceLang] = useState("en");
-  const [targetLang, setTargetLang] = useState("es");
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Navbar from "@/components/Navbar";
+import LanguageSelector from "@/components/LanguageSelector";
+import TranslatorCard from "@/components/TranslatorCard";
+import HistoryPanel from "@/components/HistoryPanel";
+import { languages } from "@/utils/languages";
+
+export default function HomePage() {
+  const [inputText, setInputText] = useState("");
+  const [translatedText, setTranslatedText] = useState("");
+  const [sourceLang, setSourceLang] = useState("auto");
+  const [targetLang, setTargetLang] = useState("en");
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("ut_history") || "[]"); } catch { return []; }
+  });
+  const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("ut_history", JSON.stringify(history));
+  }, [history]);
 
   const handleTranslate = async () => {
-    if (!text.trim()) return;
+    if (!inputText.trim()) { setStatus("Type something to translate."); return; }
     setLoading(true);
+    setStatus("");
+    setTranslatedText("");
+
     try {
       const res = await axios.post("/api/translate", {
-        text,
+        text: inputText,
         sourceLang,
-        targetLang,
-      });
-      setTranslated(res.data.translatedText);
+        targetLang
+      }, { timeout: 20000 });
+
+      if (res.data?.translatedText) {
+        setTranslatedText(res.data.translatedText);
+        const record = {
+          id: Date.now(),
+          input: inputText,
+          output: res.data.translatedText,
+          source: sourceLang === "auto" ? res.data.detectedSource || "auto" : sourceLang,
+          target: targetLang,
+          when: new Date().toISOString()
+        };
+        setHistory((s) => [record, ...s].slice(0, 200));
+      } else {
+        setStatus("No translation returned.");
+      }
     } catch (err) {
       console.error(err);
-      setTranslated("⚠️ Translation failed. Try again later.");
+      setStatus("Translation failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSwap = () => {
+    // swap only languages (keep auto logic)
+    setSourceLang(targetLang === "auto" ? "auto" : targetLang);
+    setTargetLang(sourceLang === "auto" ? "en" : sourceLang);
+    // swap texts
+    setInputText(translatedText || "");
+    setTranslatedText("");
+  };
+
+  const handleSelectHistory = (h) => {
+    setInputText(h.input);
+    setTargetLang(h.target);
+    setSourceLang(h.source === "auto" ? "auto" : h.source);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">
-        🌍 Universal Translator
-      </h1>
+    <>
+      <Navbar />
+      <main className="py-10">
+        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3">
+            <div className="mb-6 grid md:grid-cols-3 gap-4">
+              <div className="md:col-span-1">
+                <LanguageSelector value={sourceLang} onChange={setSourceLang} label="From" />
+              </div>
+              <div className="md:col-span-1">
+                <LanguageSelector value={targetLang} onChange={setTargetLang} label="To" />
+              </div>
+              <div className="md:col-span-1 flex items-end">
+                <div className="text-xs text-slate-400">Pro tip: use Auto detect on the left for convenience.</div>
+              </div>
+            </div>
 
-      <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-lg space-y-4">
-        <LanguageSelector
-          sourceLang={sourceLang}
-          targetLang={targetLang}
-          setSourceLang={setSourceLang}
-          setTargetLang={setTargetLang}
-        />
+            <TranslatorCard
+              inputText={inputText}
+              setInputText={setInputText}
+              translatedText={translatedText}
+              loading={loading}
+              onTranslate={handleTranslate}
+              sourceLang={sourceLang}
+              setSourceLang={setSourceLang}
+              targetLang={targetLang}
+              setTargetLang={setTargetLang}
+              onSwap={handleSwap}
+            >
+              <div className="text-slate-300 text-xs">
+                <div className="mb-2">Quick Actions</div>
+                <button className="w-full text-left rounded-md px-2 py-1 mb-2 bg-white/5" onClick={() => setInputText("Hello, how are you?")}>Example</button>
+                <button className="w-full text-left rounded-md px-2 py-1 bg-white/5" onClick={() => { setInputText(""); setTranslatedText(""); setStatus(""); }}>Clear</button>
+              </div>
+            </TranslatorCard>
 
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Enter text to translate..."
-          className="w-full p-3 border rounded-md"
-          rows={4}
-        />
-
-        <button
-          onClick={handleTranslate}
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-        >
-          {loading ? "Translating..." : "Translate"}
-        </button>
-
-        {translated && (
-          <div className="mt-4 p-3 border rounded-md bg-gray-100">
-            <strong>Translated Text:</strong>
-            <p className="mt-2 text-gray-800">{translated}</p>
+            {status && <div className="mt-4 max-w-4xl mx-auto text-center text-sm text-rose-400">{status}</div>}
           </div>
-        )}
-      </div>
-    </div>
+
+          <div className="lg:col-span-1">
+            <HistoryPanel history={history} onSelect={handleSelectHistory} />
+          </div>
+        </div>
+      </main>
+    </>
   );
 }

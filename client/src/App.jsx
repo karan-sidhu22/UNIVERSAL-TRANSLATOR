@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import LanguageSelector from "./components/LanguageSelector";
+import LanguageSelector from "../../components/LanguageSelector";
 import LANGUAGES from "../../utils/languages";
 
 export default function App() {
