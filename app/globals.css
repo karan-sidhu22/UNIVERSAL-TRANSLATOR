@@ -14,5 +14,5 @@ body {
 
 /* small helper */
 .scrollbar-hidden::-webkit-scrollbar {
-  display: none;
+  display: ;
 }
