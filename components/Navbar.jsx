@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { SparklesIcon } from "lucide-react";
 
-export default function Navbar() {
+export default function FuturisticNavbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hovered, setHovered] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -16,6 +18,7 @@ export default function Navbar() {
   const navItems = [
     { label: "Home", href: "/" },
     { label: "Docs", href: "/docs" },
+    { label: "AI Translate", href: "/translate" },
     { label: "Pricing", href: "/pricing" },
   ];
 
@@ -24,46 +27,75 @@ export default function Navbar() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
         scrolled
-          ? "bg-bg/70 backdrop-blur-lg border-b border-white/10 shadow-[0_0_40px_rgba(139,92,246,0.15)]"
-          : "bg-transparent backdrop-blur-none border-transparent"
+          ? "bg-[rgba(12,12,24,0.8)] backdrop-blur-2xl border-b border-white/10 shadow-[0_0_40px_rgba(99,102,241,0.25)]"
+          : "bg-transparent"
       }`}
     >
-      <nav className="mx-auto max-w-7xl flex items-center justify-between px-6 md:px-8 py-4">
-        {/* Logo Section */}
+      <nav className="mx-auto max-w-7xl flex items-center justify-between px-6 md:px-10 py-4">
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <motion.h1
-            whileHover={{ scale: 1.05 }}
-            className="text-xl md:text-2xl font-bold tracking-tight bg-gradient-to-r from-accent2 to-accent bg-clip-text text-transparent group-hover:from-accent group-hover:to-accent2 transition-all"
+          <motion.div
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           >
-            UT<span className="opacity-80">.</span>
+            <SparklesIcon className="text-accent2 w-6 h-6" />
+          </motion.div>
+          <motion.h1
+            className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+            whileHover={{ scale: 1.05, rotate: 2 }}
+            transition={{ duration: 0.3 }}
+          >
+            Universal<span className="opacity-70">.AI</span>
           </motion.h1>
-          <p className="hidden sm:block text-sm text-slate-400 group-hover:text-slate-200 transition-colors">
-            Universal Translator
-          </p>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+        <ul className="hidden md:flex items-center gap-10 text-sm font-medium">
           {navItems.map((item, idx) => (
-            <Link
+            <motion.li
               key={idx}
-              href={item.href}
-              className="relative group text-slate-300 hover:text-white transition-colors"
+              onMouseEnter={() => setHovered(idx)}
+              onMouseLeave={() => setHovered(null)}
+              className="relative"
             >
-              {item.label}
-              <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-gradient-to-r from-accent to-accent2 group-hover:w-full transition-all duration-300"></span>
-            </Link>
+              <Link
+                href={item.href}
+                className="relative text-slate-300 hover:text-white transition-all duration-300"
+              >
+                {item.label}
+                {hovered === idx && (
+                  <motion.span
+                    layoutId="hover-line"
+                    className="absolute left-0 -bottom-1 h-[2px] w-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-full"
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  />
+                )}
+              </Link>
+            </motion.li>
           ))}
-        </div>
+        </ul>
 
-        {/* Mobile Menu (optional simple button) */}
-        <button className="md:hidden flex flex-col gap-1.5 focus:outline-none group">
-          <span className="w-6 h-0.5 bg-slate-300 group-hover:bg-accent transition-all"></span>
-          <span className="w-6 h-0.5 bg-slate-300 group-hover:bg-accent2 transition-all"></span>
-          <span className="w-6 h-0.5 bg-slate-300 group-hover:bg-accent transition-all"></span>
-        </button>
+        {/* Neon Button */}
+        <motion.button
+          whileHover={{
+            scale: 1.05,
+            boxShadow:
+              "0 0 15px rgba(168,85,247,0.8), 0 0 30px rgba(34,211,238,0.4)",
+          }}
+          whileTap={{ scale: 0.97 }}
+          className="hidden md:block px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 text-white font-semibold shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(34,211,238,0.5)] transition-all"
+        >
+          Launch App
+        </motion.button>
+
+        {/* Mobile menu button */}
+        <div className="md:hidden flex flex-col gap-1 cursor-pointer">
+          <span className="w-6 h-0.5 bg-slate-300"></span>
+          <span className="w-6 h-0.5 bg-slate-300"></span>
+          <span className="w-6 h-0.5 bg-slate-300"></span>
+        </div>
       </nav>
     </motion.header>
   );

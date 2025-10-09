@@ -6,6 +6,9 @@
 :root {
   --accent-from: #8b5cf6; /* violet */
   --accent-to: #06b6d4; /* cyan */
+  --bg-dark: #0b0f19;
+  --bg-light: #1e293b;
+  --grid-line: rgba(255, 255, 255, 0.05);
 }
 
 /* 🌍 Base Typography & Layout */
@@ -16,24 +19,30 @@ html {
 body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
-  @apply bg-bg text-white antialiased overflow-x-hidden;
-  background: linear-gradient(-45deg, #0f172a, #1e293b, #0b0f19, #111827);
+  @apply text-white antialiased overflow-x-hidden;
+  background: linear-gradient(-45deg, var(--bg-dark), var(--bg-light), #111827, #0f172a);
   background-size: 400% 400%;
-  animation: gradientShift 12s ease infinite;
+  animation: gradientShift 16s ease infinite;
+  position: relative;
   transition: background 0.5s ease, color 0.3s ease;
+  min-height: 100vh;
+  overflow-y: auto;
 }
 
-/* ✨ Card & Glass Utilities */
-.card-glass {
-  @apply backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-card transition-all duration-500;
+/* 🧩 Animated Grid Overlay (futuristic subtle grid lines) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  z-index: 0;
+  opacity: 0.25;
+  pointer-events: none;
 }
 
-.card-glass:hover {
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.2),
-    0 0 60px rgba(6, 182, 212, 0.15);
-}
-
-/* 🔮 Animated Gradient Background */
+/* ✨ Gradient Motion */
 @keyframes gradientShift {
   0% {
     background-position: 0% 50%;
@@ -46,29 +55,37 @@ body {
   }
 }
 
-/* 🌊 Floating Particles / Glow Orbs */
+/* 🌌 Floating Glow Orbs */
 .particle {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  filter: blur(2px);
-  animation: float 8s ease-in-out infinite;
+  background: radial-gradient(
+    circle at center,
+    rgba(139, 92, 246, 0.25),
+    rgba(6, 182, 212, 0)
+  );
+  filter: blur(6px);
+  animation: float 10s ease-in-out infinite;
+  mix-blend-mode: screen;
 }
 
 @keyframes float {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0px) scale(1);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px) scale(1.1);
   }
 }
 
-/* ✨ Text & Selection Highlights */
-::selection {
-  background: rgba(139, 92, 246, 0.3);
-  color: #fff;
+/* ✨ Card & Glass Utilities */
+.card-glass {
+  @apply backdrop-blur-2xl bg-white/5 border border-white/10 rounded-2xl shadow-card transition-all duration-500;
+}
+.card-glass:hover {
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.3),
+    0 0 60px rgba(6, 182, 212, 0.2);
 }
 
 /* 💡 Headings */
@@ -79,33 +96,43 @@ h4 {
   @apply font-semibold text-white;
   letter-spacing: -0.02em;
 }
-
 p {
   @apply text-slate-300;
 }
 
-/* 🧭 Link Styling */
-a {
-  @apply text-accent hover:text-accent2 transition-colors duration-300;
-}
-
 /* 💫 Buttons */
 .btn-primary {
-  @apply px-4 py-2 rounded-md font-medium text-white bg-gradient-to-r from-[var(--accent-from)] to-[var(--accent-to)] shadow-glow transition-all duration-300;
+  @apply px-4 py-2 rounded-md font-medium text-white 
+  bg-gradient-to-r from-[var(--accent-from)] to-[var(--accent-to)] 
+  shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all duration-300;
 }
 .btn-primary:hover {
-  filter: brightness(1.15);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+  filter: brightness(1.2);
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.5);
+  transform: scale(1.02);
 }
 
 /* 🔁 Inputs, Textareas, Selects */
 input,
 textarea,
 select {
-  @apply bg-white/10 border border-white/10 text-white placeholder-slate-400 rounded-md focus:outline-none focus:ring-2 focus:ring-accent transition duration-200;
+  @apply bg-white/10 border border-white/10 text-white 
+  placeholder-slate-400 rounded-md px-3 py-2 focus:outline-none 
+  focus:ring-2 focus:ring-[var(--accent-from)] transition duration-200;
 }
 
-/* 🧩 Scrollbar (hidden but scrollable) */
+/* 🌈 Text Selection */
+::selection {
+  background: rgba(139, 92, 246, 0.3);
+  color: #fff;
+}
+
+/* 🧭 Links */
+a {
+  @apply text-[var(--accent-from)] hover:text-[var(--accent-to)] transition-colors duration-300;
+}
+
+/* 🧩 Scrollbar Hidden */
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
@@ -114,7 +141,14 @@ select {
   scrollbar-width: none;
 }
 
-/* 🕶 Smooth transitions globally */
+/* 🪞 Global Smooth Transitions */
 * {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.25s ease-in-out;
+}
+
+/* 🌟 Hover Glow Utility */
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3),
+    0 0 30px rgba(6, 182, 212, 0.25);
+  transform: scale(1.01);
 }
