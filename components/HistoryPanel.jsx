@@ -1,13 +1,32 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { Trash2Icon } from "lucide-react"; // 🗑 optional: icon for clear button
 
-export default function HistoryPanel({ history, onSelect }) {
+export default function HistoryPanel({ history, onSelect, onClear }) {
   return (
     <div className="relative">
-      <h2 className="text-lg font-semibold mb-5 bg-gradient-to-r from-accent to-accent2 bg-clip-text text-transparent">
-      </h2>
+      {/* Header + Clear Button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold bg-gradient-to-r from-accent to-accent2 bg-clip-text text-transparent">
+          Translation History
+        </h2>
 
+        {history.length > 0 && (
+          <button
+            onClick={onClear}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium
+                       text-slate-300 hover:text-white bg-white/10 hover:bg-white/20
+                       border border-white/10 hover:border-accent/40
+                       transition-all duration-300 backdrop-blur-sm"
+          >
+            <Trash2Icon size={14} />
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* History List */}
       <div className="space-y-3 max-h-[460px] overflow-y-auto pr-2 scrollbar-hidden">
         {history.length === 0 ? (
           <p className="text-sm text-slate-400 italic">No history yet.</p>
@@ -21,14 +40,16 @@ export default function HistoryPanel({ history, onSelect }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ delay: index * 0.05, duration: 0.25 }}
-                className="w-full text-left p-4 rounded-xl bg-gradient-to-br from-white/5 to-white/[0.02] 
+                className="w-full text-left p-4 rounded-xl bg-gradient-to-br from-white/5 to-white/[0.02]
                            border border-white/10 hover:border-accent/40
                            hover:shadow-[0_0_25px_rgba(139,92,246,0.25)]
                            transition-all duration-300 backdrop-blur-md group relative overflow-hidden"
               >
                 {/* glowing border animation */}
-                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 
-                                bg-gradient-to-r from-accent/20 to-accent2/20 blur-2xl rounded-xl"></span>
+                <span
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 
+                             bg-gradient-to-r from-accent/20 to-accent2/20 blur-2xl rounded-xl"
+                ></span>
 
                 {/* Text content */}
                 <div className="relative z-10">

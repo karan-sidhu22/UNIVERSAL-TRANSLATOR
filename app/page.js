@@ -198,7 +198,6 @@ export default function HomePage() {
           className="backdrop-blur-xl bg-white/[0.05] border border-white/10 rounded-3xl p-6 shadow-[0_0_40px_rgba(139,92,246,0.1)]"
         >
           <h2 className="text-lg font-semibold mb-4 bg-gradient-to-r from-accent to-accent2 bg-clip-text text-transparent">
-            History
           </h2>
           <div className="max-h-[500px] overflow-y-auto pr-1 scrollbar-hidden">
             <HistoryPanel history={history} onSelect={handleSelectHistory} />
