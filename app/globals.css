@@ -1,24 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent-from: #00f5d4;
+  --accent-to: #6a5cff;
+}
+
 body {
-  @apply bg-bg text-white;
-  background: linear-gradient(-45deg, #0f172a, #1e293b, #0b0f19, #111827);
-  background-size: 400% 400%;
-  animation: gradientShift 12s ease infinite;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial;
 }
 
-/* Optional floating particles background */
-.particle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  filter: blur(2px);
-  animation: float 8s ease-in-out infinite;
-}
-
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+/* small helper */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
 }
