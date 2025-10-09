@@ -7,11 +7,10 @@ import Navbar from "@/components/Navbar";
 import LanguageSelector from "@/components/LanguageSelector";
 import TranslatorCard from "@/components/TranslatorCard";
 import HistoryPanel from "@/components/HistoryPanel";
+import ParticlesBackground from "@/components/ParticlesBackground";
 
 export default function HomePage() {
-  // ✅ Mounted state to prevent hydration mismatch
   const [mounted, setMounted] = useState(false);
-
   const [inputText, setInputText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
   const [sourceLang, setSourceLang] = useState("auto");
@@ -20,7 +19,6 @@ export default function HomePage() {
   const [status, setStatus] = useState("");
   const [history, setHistory] = useState([]);
 
-  // ✅ Load history only after client mounts
   useEffect(() => {
     setMounted(true);
     try {
@@ -31,14 +29,10 @@ export default function HomePage() {
     }
   }, []);
 
-  // ✅ Save history after mounted
   useEffect(() => {
-    if (mounted) {
-      localStorage.setItem("ut_history", JSON.stringify(history));
-    }
+    if (mounted) localStorage.setItem("ut_history", JSON.stringify(history));
   }, [history, mounted]);
 
-  // 🧠 Translation Logic
   const handleTranslate = async () => {
     if (!inputText.trim()) {
       setStatus("Type something to translate.");
@@ -58,7 +52,6 @@ export default function HomePage() {
 
       if (res.data?.translatedText) {
         setTranslatedText(res.data.translatedText);
-
         const record = {
           id: Date.now(),
           input: inputText,
@@ -70,7 +63,6 @@ export default function HomePage() {
           target: targetLang,
           when: new Date().toISOString(),
         };
-
         setHistory((prev) => [record, ...prev].slice(0, 200));
       } else {
         setStatus("No translation returned.");
@@ -83,7 +75,6 @@ export default function HomePage() {
     }
   };
 
-  // 🔄 Swap Languages
   const handleSwap = () => {
     setSourceLang(targetLang === "auto" ? "auto" : targetLang);
     setTargetLang(sourceLang === "auto" ? "en" : sourceLang);
@@ -91,38 +82,42 @@ export default function HomePage() {
     setTranslatedText("");
   };
 
-  // 📜 Select from history
   const handleSelectHistory = (h) => {
     setInputText(h.input);
     setTargetLang(h.target);
     setSourceLang(h.source === "auto" ? "auto" : h.source);
   };
 
-  // ⛔ Prevent SSR mismatch
   if (!mounted) return null;
 
-  // 🎨 Animated UI
   return (
     <>
-      <Navbar />
-      <main className="min-h-screen bg-bg text-white py-10 relative overflow-hidden bg-gradient-glow">
-        {/* Floating background lights */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.05),transparent_60%)] animate-pulseSlow" />
+      <main className="relative min-h-screen overflow-hidden text-white">
+        {/* ✨ Background animations */}
+        <div className="absolute inset-0 bg-animated-gradient animate-gradientShift"></div>
+        <ParticlesBackground />
 
+        <Navbar />
+
+        {/* 🌈 Glowing background blobs */}
+        <div className="absolute top-10 left-10 w-40 h-40 bg-accent/30 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-10 right-10 w-56 h-56 bg-accent2/30 rounded-full blur-3xl animate-float"></div>
+
+        {/* 🌐 Page Content */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="max-w-7xl mx-auto px-6 grid lg:grid-cols-4 gap-6 relative z-10"
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-10 grid grid-cols-1 lg:grid-cols-4 gap-6"
         >
           {/* 🗣 Translator Section */}
           <motion.div
-            className="lg:col-span-3 backdrop-blur-md bg-card p-6 rounded-xl2 border border-white/10 shadow-soft"
-            initial={{ opacity: 0, y: 25 }}
+            className="lg:col-span-3 backdrop-blur-md bg-card p-6 rounded-2xl border border-white/10 shadow-soft"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {/* Language Selectors */}
+            {/* Language selectors */}
             <div className="mb-6 grid md:grid-cols-3 gap-4">
               <div className="md:col-span-1">
                 <LanguageSelector
@@ -146,7 +141,7 @@ export default function HomePage() {
               </motion.div>
             </div>
 
-            {/* Translation Card */}
+            {/* Translator Card */}
             <TranslatorCard
               inputText={inputText}
               setInputText={setInputText}
@@ -187,7 +182,6 @@ export default function HomePage() {
               </div>
             </TranslatorCard>
 
-            {/* Status Message */}
             {status && (
               <motion.div
                 className="mt-4 text-center text-sm text-rose-400"
@@ -201,7 +195,7 @@ export default function HomePage() {
 
           {/* 📚 History Panel */}
           <motion.div
-            className="lg:col-span-1 backdrop-blur-md bg-card p-4 rounded-xl2 border border-white/10 shadow-soft"
+            className="lg:col-span-1 backdrop-blur-md bg-card p-4 rounded-2xl border border-white/10 shadow-soft"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
