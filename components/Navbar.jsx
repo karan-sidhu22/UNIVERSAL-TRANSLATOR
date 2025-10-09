@@ -1,22 +1,25 @@
+"use client";
+import Link from "next/link";
+
 export default function Navbar() {
   return (
-    <header className="border-b border-white/6">
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#00f5d4] to-[#6a5cff] flex items-center justify-center text-slate-900 font-extrabold">
-            UT
-          </div>
-          <div>
-            <div className="text-lg font-semibold">Universal Translator</div>
-            <div className="text-xs text-slate-400">Translate with context & style</div>
-          </div>
+    <nav className="w-full fixed top-0 left-0 z-50 bg-bg/60 backdrop-blur-md border-b border-white/10 shadow-soft">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between text-white">
+        <h1 className="text-xl font-semibold tracking-wide text-accent">
+          UT <span className="text-accent2">Translator</span>
+        </h1>
+        <div className="flex gap-6 text-sm">
+          <Link href="/" className="hover:text-accent2 transition">
+            Home
+          </Link>
+          <Link href="/docs" className="hover:text-accent2 transition">
+            Docs
+          </Link>
+          <Link href="/pricing" className="hover:text-accent2 transition">
+            Pricing
+          </Link>
         </div>
-        <nav className="text-sm text-slate-300">
-          <a className="mr-6 hover:text-white" href="#">Home</a>
-          <a className="mr-6 hover:text-white" href="#">Docs</a>
-          <a className="hover:text-white" href="#">Pricing</a>
-        </nav>
       </div>
-    </header>
+    </nav>
   );
 }
