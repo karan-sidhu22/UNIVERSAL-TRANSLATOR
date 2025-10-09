@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import LanguageSelector from "@/components/LanguageSelector";
 import TranslatorCard from "@/components/TranslatorCard";
 import HistoryPanel from "@/components/HistoryPanel";
-import { languages } from "@/utils/languages";
 
 export default function HomePage() {
   const [inputText, setInputText] = useState("");
@@ -14,17 +14,26 @@ export default function HomePage() {
   const [sourceLang, setSourceLang] = useState("auto");
   const [targetLang, setTargetLang] = useState("en");
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("ut_history") || "[]"); } catch { return []; }
-  });
   const [status, setStatus] = useState("");
+  const [history, setHistory] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("ut_history") || "[]");
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     localStorage.setItem("ut_history", JSON.stringify(history));
   }, [history]);
 
+  // 🔁 Translation Logic
   const handleTranslate = async () => {
-    if (!inputText.trim()) { setStatus("Type something to translate."); return; }
+    if (!inputText.trim()) {
+      setStatus("Type something to translate.");
+      return;
+    }
+
     setLoading(true);
     setStatus("");
     setTranslatedText("");
@@ -33,8 +42,8 @@ export default function HomePage() {
       const res = await axios.post("/api/translate", {
         text: inputText,
         sourceLang,
-        targetLang
-      }, { timeout: 20000 });
+        targetLang,
+      });
 
       if (res.data?.translatedText) {
         setTranslatedText(res.data.translatedText);
@@ -42,11 +51,14 @@ export default function HomePage() {
           id: Date.now(),
           input: inputText,
           output: res.data.translatedText,
-          source: sourceLang === "auto" ? res.data.detectedSource || "auto" : sourceLang,
+          source:
+            sourceLang === "auto"
+              ? res.data.detectedSource || "auto"
+              : sourceLang,
           target: targetLang,
-          when: new Date().toISOString()
+          when: new Date().toISOString(),
         };
-        setHistory((s) => [record, ...s].slice(0, 200));
+        setHistory((prev) => [record, ...prev].slice(0, 200));
       } else {
         setStatus("No translation returned.");
       }
@@ -58,11 +70,10 @@ export default function HomePage() {
     }
   };
 
+  // 🔄 Swap Function
   const handleSwap = () => {
-    // swap only languages (keep auto logic)
     setSourceLang(targetLang === "auto" ? "auto" : targetLang);
     setTargetLang(sourceLang === "auto" ? "en" : sourceLang);
-    // swap texts
     setInputText(translatedText || "");
     setTranslatedText("");
   };
@@ -73,24 +84,52 @@ export default function HomePage() {
     setSourceLang(h.source === "auto" ? "auto" : h.source);
   };
 
+  // 🌌 Animated Layout
   return (
     <>
       <Navbar />
-      <main className="py-10">
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-3">
+      <main className="min-h-screen bg-bg text-white py-10 relative overflow-hidden bg-gradient-glow">
+        {/* Animated floating lights */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.05),transparent_60%)] animate-pulseSlow" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-7xl mx-auto px-6 grid lg:grid-cols-4 gap-6 relative z-10"
+        >
+          {/* Translator Section */}
+          <motion.div
+            className="lg:col-span-3 backdrop-blur-md bg-card p-6 rounded-xl2 border border-white/10 shadow-soft"
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {/* Language Selection */}
             <div className="mb-6 grid md:grid-cols-3 gap-4">
               <div className="md:col-span-1">
-                <LanguageSelector value={sourceLang} onChange={setSourceLang} label="From" />
+                <LanguageSelector
+                  value={sourceLang}
+                  onChange={setSourceLang}
+                  label="From"
+                />
               </div>
               <div className="md:col-span-1">
-                <LanguageSelector value={targetLang} onChange={setTargetLang} label="To" />
+                <LanguageSelector
+                  value={targetLang}
+                  onChange={setTargetLang}
+                  label="To"
+                />
               </div>
-              <div className="md:col-span-1 flex items-end">
-                <div className="text-xs text-slate-400">Pro tip: use Auto detect on the left for convenience.</div>
-              </div>
+              <motion.div
+                className="md:col-span-1 flex items-end text-xs text-slate-400"
+                whileHover={{ scale: 1.05 }}
+              >
+                💡 Tip: Use Auto Detect for smart recognition.
+              </motion.div>
             </div>
 
+            {/* Translator Card */}
             <TranslatorCard
               inputText={inputText}
               setInputText={setInputText}
@@ -98,25 +137,61 @@ export default function HomePage() {
               loading={loading}
               onTranslate={handleTranslate}
               sourceLang={sourceLang}
-              setSourceLang={setSourceLang}
               targetLang={targetLang}
-              setTargetLang={setTargetLang}
               onSwap={handleSwap}
             >
-              <div className="text-slate-300 text-xs">
-                <div className="mb-2">Quick Actions</div>
-                <button className="w-full text-left rounded-md px-2 py-1 mb-2 bg-white/5" onClick={() => setInputText("Hello, how are you?")}>Example</button>
-                <button className="w-full text-left rounded-md px-2 py-1 bg-white/5" onClick={() => { setInputText(""); setTranslatedText(""); setStatus(""); }}>Clear</button>
+              {/* Quick Actions */}
+              <div className="text-slate-300 text-xs mt-4">
+                <div className="mb-2 font-semibold tracking-wide uppercase text-slate-400">
+                  Quick Actions
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full text-left rounded-md px-3 py-2 mb-2 bg-white/10 hover:bg-white/20 transition-all"
+                  onClick={() => setInputText("Hello, how are you?")}
+                >
+                  Example
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full text-left rounded-md px-3 py-2 bg-white/10 hover:bg-white/20 transition-all"
+                  onClick={() => {
+                    setInputText("");
+                    setTranslatedText("");
+                    setStatus("");
+                  }}
+                >
+                  Clear
+                </motion.button>
               </div>
             </TranslatorCard>
 
-            {status && <div className="mt-4 max-w-4xl mx-auto text-center text-sm text-rose-400">{status}</div>}
-          </div>
+            {/* Status Message */}
+            {status && (
+              <motion.div
+                className="mt-4 text-center text-sm text-rose-400"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {status}
+              </motion.div>
+            )}
+          </motion.div>
 
-          <div className="lg:col-span-1">
+          {/* History Panel */}
+          <motion.div
+            className="lg:col-span-1 backdrop-blur-md bg-card p-4 rounded-xl2 border border-white/10 shadow-soft"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             <HistoryPanel history={history} onSelect={handleSelectHistory} />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
     </>
   );
