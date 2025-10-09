@@ -35,7 +35,7 @@ export default function HomePage() {
     if (mounted) localStorage.setItem("ut_history", JSON.stringify(history));
   }, [history, mounted]);
 
-  // 🌍 Translate handler
+  // 🌍 Translation
   const handleTranslate = async () => {
     if (!inputText.trim()) return setStatus("Type something to translate.");
     setLoading(true);
@@ -74,7 +74,7 @@ export default function HomePage() {
     }
   };
 
-  // 🔁 Swap handler
+  // 🔁 Swap
   const handleSwap = () => {
     setSourceLang(targetLang === "auto" ? "auto" : targetLang);
     setTargetLang(sourceLang === "auto" ? "en" : sourceLang);
@@ -91,7 +91,7 @@ export default function HomePage() {
 
   // 🗑 Clear history
   const handleClearHistory = () => {
-    if (confirm("Are you sure you want to clear all translation history?")) {
+    if (confirm("Clear all translation history?")) {
       setHistory([]);
       localStorage.removeItem("ut_history");
     }
@@ -100,17 +100,17 @@ export default function HomePage() {
   if (!mounted) return null;
 
   return (
-    <main className="relative min-h-screen text-white overflow-hidden">
-      {/* ✨ Background animation */}
+    <main className="relative min-h-screen text-white overflow-hidden font-inter selection:bg-accent/40 selection:text-white">
+      {/* ✨ Background */}
       <div className="absolute inset-0 bg-animated-gradient animate-gradientShift"></div>
       <ParticlesBackground />
       <Navbar />
 
-      {/* Ambient glow blobs */}
-      <div className="absolute top-0 left-0 w-80 h-80 bg-accent/30 blur-[140px] rounded-full animate-float"></div>
-      <div className="absolute bottom-0 right-0 w-[32rem] h-[32rem] bg-accent2/30 blur-[180px] rounded-full animate-float"></div>
+      {/* 🌌 Ambient light blobs */}
+      <div className="absolute top-[-6rem] left-[-6rem] w-96 h-96 bg-accent/25 blur-[160px] rounded-full animate-float"></div>
+      <div className="absolute bottom-[-10rem] right-[-8rem] w-[34rem] h-[34rem] bg-accent2/25 blur-[200px] rounded-full animate-float"></div>
 
-      {/* 🌐 Main Section */}
+      {/* 🧩 Main Content */}
       <motion.section
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -122,20 +122,21 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-2 backdrop-blur-xl bg-white/[0.05] border border-white/10 rounded-3xl p-8 
-                     shadow-[0_0_60px_rgba(139,92,246,0.15)] hover:shadow-[0_0_80px_rgba(139,92,246,0.25)] transition-all duration-500"
+          className="lg:col-span-2 backdrop-blur-2xl bg-white/[0.05] border border-white/10 
+                     rounded-3xl p-8 shadow-[0_0_60px_rgba(139,92,246,0.15)] 
+                     hover:shadow-[0_0_80px_rgba(139,92,246,0.25)] transition-all duration-500"
         >
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-accent2 to-accent bg-clip-text text-transparent">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-accent2 to-accent bg-clip-text text-transparent">
               Universal Translator
             </h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Translate instantly with context, tone, and precision.
+            <p className="text-slate-400 text-sm mt-2">
+              Translate effortlessly with AI-enhanced context, tone, and precision.
             </p>
           </div>
 
-          {/* Language Selectors */}
+          {/* 🌍 Language Selectors */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             <LanguageSelector
               value={sourceLang}
@@ -147,35 +148,35 @@ export default function HomePage() {
               onChange={setTargetLang}
               label="To"
             />
-            <div className="hidden lg:flex items-end text-xs text-slate-400">
+            <div className="hidden lg:flex items-end text-xs text-slate-400 italic">
               💡 Tip: Use Auto-detect for convenience.
             </div>
           </div>
 
-          {/* Translator Card */}
+          {/* 🧾 Translator Interface */}
           <TranslatorCard
             inputText={inputText}
             setInputText={setInputText}
             translatedText={translatedText}
             loading={loading}
             onTranslate={handleTranslate}
-            sourceLang={sourceLang}
-            targetLang={targetLang}
             onSwap={handleSwap}
           >
-            {/* Quick Actions */}
-            <div className="mt-4 border-t border-white/10 pt-4">
+            {/* ⚙️ Quick Actions */}
+            <div className="mt-6 border-t border-white/10 pt-4">
               <div className="mb-3 text-slate-400 text-xs uppercase tracking-wide">
                 Quick Actions
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-wrap gap-3">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setInputText("Hello, how are you?")}
-                  className="flex-1 text-center px-4 py-2 rounded-md bg-gradient-to-r from-accent2 to-accent 
-                             shadow-[0_0_15px_rgba(139,92,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] 
-                             transition-all font-medium"
+                  className="px-4 py-2 text-sm rounded-md font-medium
+                             bg-gradient-to-r from-accent2 to-accent text-white
+                             shadow-[0_0_20px_rgba(139,92,246,0.4)]
+                             hover:shadow-[0_0_25px_rgba(139,92,246,0.6)]
+                             transition-all duration-300"
                 >
                   Example
                 </motion.button>
@@ -188,8 +189,9 @@ export default function HomePage() {
                     setTranslatedText("");
                     setStatus("");
                   }}
-                  className="flex-1 text-center px-4 py-2 rounded-md bg-white/10 hover:bg-white/20 
-                             text-slate-200 border border-white/10 transition-all font-medium"
+                  className="px-4 py-2 text-sm rounded-md font-medium
+                             bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 text-slate-200
+                             hover:text-accent2 transition-all duration-300 backdrop-blur-md"
                 >
                   Clear
                 </motion.button>
@@ -208,31 +210,31 @@ export default function HomePage() {
           )}
         </motion.div>
 
-        {/* 📜 History Panel */}
+        {/* 🕹️ History Panel */}
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
-          className="backdrop-blur-xl bg-white/[0.05] border border-white/10 rounded-3xl p-6 
+          className="backdrop-blur-2xl bg-white/[0.05] border border-white/10 rounded-3xl p-6
                      shadow-[0_0_40px_rgba(139,92,246,0.1)]"
         >
-          <div className="max-h-[500px] overflow-y-auto pr-1 scrollbar-hidden">
-            <HistoryPanel
-              history={history}
-              onSelect={handleSelectHistory}
-              onClear={handleClearHistory}
-            />
-          </div>
+          <HistoryPanel
+            history={history}
+            onSelect={handleSelectHistory}
+            onClear={handleClearHistory}
+          />
         </motion.div>
       </motion.section>
 
-      {/* 📱 Floating Translate Button (Mobile) */}
+      {/* 📱 Mobile Floating Translate Button */}
       <motion.button
         onClick={handleTranslate}
         whileTap={{ scale: 0.95 }}
-        className="lg:hidden fixed bottom-8 right-8 z-50 px-6 py-3 rounded-full 
-                   bg-gradient-to-r from-accent2 to-accent shadow-[0_0_25px_rgba(139,92,246,0.4)] 
-                   hover:shadow-[0_0_35px_rgba(139,92,246,0.6)] transition-all text-white font-semibold"
+        className="lg:hidden fixed bottom-8 right-8 z-50 px-6 py-3 rounded-full
+                   bg-gradient-to-r from-accent2 to-accent text-white font-semibold
+                   shadow-[0_0_30px_rgba(139,92,246,0.4)]
+                   hover:shadow-[0_0_40px_rgba(139,92,246,0.6)]
+                   transition-all duration-300"
       >
         {loading ? "Translating..." : "Translate"}
       </motion.button>
